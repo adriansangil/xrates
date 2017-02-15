@@ -1,41 +1,40 @@
 import koa from 'koa';
 import 'babel-polyfill';
+import router from 'koa-router'
+import MyUtilities from './utilities';
+import routes from "./routes";
 
 let app = koa();
+let _ = router();
+//let myUtil = myUtilities();
 
-app.use(function* (next) {
-    //do something before yielding to next generator function 
-    //in line which will be 1st event in downstream
-    
-    console.log("1");
-    yield next;
- 
-    // do something when the execution returns upstream, 
-    //this will be last event in upstream
-    console.log("2");
-});
- 
-app.use(function* (next) {
-    // This shall be 2nd event downstream
-    
-    console.log("3");
-    yield next;
- 
-    // This would be 2nd event upstream
-    console.log("4");
-});
- 
-app.use(function* () { 
+//load my controllers
+MyUtilities.dynamicRequire('./controllers');
 
-	// Here it would be last function downstream
-    console.log("5");
-    
-    // Set response body
-    this.body = "Hello Generators";
+for (let key in routes) {
+    let x = key.split(" ");
+	let method = x[0].toLowerCase();
+	let path = x[1];
+	
+	//console.log(method);
+	//console.log(path);
+	//console.log(routes[key]);
 
-    // First event of upstream (from the last to first)
-    console.log("6"); 
- 
-});
- 
+	_[method](path, MyUtilities.refObj(routes[key]));
+}
+
+/*_.get('/hello', getMessage); // Define routes
+
+function *getMessage(){
+	this.body = "Hello world!";
+};*/
+
+app.use(_.routes()); //Use the routes defined using the router
+
 app.listen(3000);
+
+let util = new MyUtilities();
+
+
+
+
