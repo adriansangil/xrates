@@ -1,39 +1,77 @@
-import koa from 'koa';
+import Koa from 'koa';
 import 'babel-polyfill';
 import router from 'koa-router'
 import MyUtilities from './utilities';
-import routes from "./routes";
+import routes from './routes';
+import mongoose from 'mongoose';
+import bodyParser from 'koa-bodyparser';
+import CustomException from './error'
+import kcors from 'kcors';
 
-let app = koa();
+let cache = require('koa-rest-cache');
+
+let app = new Koa();
 let _ = router();
-//let myUtil = myUtilities();
 
-//load my controllers
+app.use(kcors);
+//caching
+app.use(cache({
+  pattern: '/rates',
+  maxAge: 600000 // ms
+}));
+
+app.use(bodyParser());
+
+//load controllers
 MyUtilities.dynamicRequire('./controllers');
 
+MyUtilities.dynamicRequire('./models');
+
 for (let key in routes) {
-    let x = key.split(" ");
+	let x = key.split(" ");
 	let method = x[0].toLowerCase();
 	let path = x[1];
-	
-	//console.log(method);
-	//console.log(path);
-	//console.log(routes[key]);
+		
 
 	_[method](path, MyUtilities.refObj(routes[key]));
 }
 
-/*_.get('/hello', getMessage); // Define routes
+//Error handling middleware
+app.use(async (ctx, next) => {
+	try {
+	   	await next();
+	} catch (err) {
+	  	if (err instanceof CustomException) {
+	        ctx.body = {
+	        	code: err.code,
+	        	message: err.message
+	        };
 
-function *getMessage(){
-	this.body = "Hello world!";
-};*/
+	        ctx.status = 400;
+	        
+	    } else if (err.name === 'ValidationError') {
+	        ctx.status = 400;
+	        ctx.body = {
+	          code: 'INVALID_REQUEST',
+	          message: err.message,
+	          errors: err.errors
+	        };
+	    } else {
+	        ctx.body = {
+	          code: 'INTERNAL_SERVER_ERROR',
+	          message: err.message
+	        };
+	        ctx.status = 500;
+	    }
 
-app.use(_.routes()); //Use the routes defined using the router
+	    ctx.app.emit('error', err, ctx);
+	}
+});
+
+app.use(_.routes());
 
 app.listen(3000);
 
-let util = new MyUtilities();
 
 
 
