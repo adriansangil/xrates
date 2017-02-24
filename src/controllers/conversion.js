@@ -8,7 +8,23 @@ export let ConversionController = {
 	convert: async (ctx) => {
 		ctx.body = "update";
 
-		
+		let conversionRequest = ctx.request.body;
+		let currencyDate = ctx.params.date || moment().startOf('day');
+
+		Rate.validateConversion(conversionRequest);
+
+		let rate = await Rate
+			.find({"date":{$lte: currencyDate}})
+			.sort({"date":-1})
+			.limit(1)
+			.exec();
+
+		if (!rate || rate.length < 1) {
+	      throw new CustomException("", "Currency Exchange not found");
+   		}
+
+   		console.log(rate);
+   		ctx.body = util.convert(rate[0], conversionRequest.base, conversionRequest.values);
 
 	},
 

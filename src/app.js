@@ -6,14 +6,17 @@ import routes from './routes';
 import mongoose from 'mongoose';
 import bodyParser from 'koa-bodyparser';
 import CustomException from './error'
-import kcors from 'kcors';
+import cors from 'koa-cors';
 
 let cache = require('koa-rest-cache');
 
 let app = new Koa();
 let _ = router();
 
-app.use(kcors);
+app.use(cors({
+	methods: 'GET,PATCH,POST,DELETE'
+}));
+
 //caching
 app.use(cache({
   pattern: '/rates',

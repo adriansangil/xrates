@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+let config = require('config');
 
-mongoose.connect('mongodb://localhost/rate');
+mongoose.connect(config.DBHost);
 
 let db = mongoose.connection;
 db.on('error', function(err) {
