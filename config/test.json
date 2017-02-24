@@ -1,3 +1,4 @@
 {
-	"DBHost":"mongodb://localhost/testRates"
+	"DBHost":"mongodb://localhost/testRates",
+	"env":"test env"
 }

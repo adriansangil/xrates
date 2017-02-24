@@ -4,13 +4,12 @@
   "description": "API for currency conversion",
   "main": "index.js",
   "scripts": {
-    "start": "SET NODE_ENV=dev&& node dist/app",
+    "start": "SET NODE_ENV=default&& node dist/app",
     "clean": "rm -rf dist/",
     "build": "npm run clean && babel src -d dist",
-    "eslint": "eslint src/",
-    "test": "npm run build && babel test -d dist/test && mocha --bail dist/test",
-    "devEnv": "SET NODE ENV",
-    "startDev": "npm run devEnv && node dist/app"
+    "eslint": "export src/",
+    "test": "npm run build && babel test -d dist/test && SET NODE_ENV=test&& mocha --bail dist/test",
+    "startDev": "SET NODE_ENV=dev&& node dist/app"
   },
   "repository": {
     "type": "git",
@@ -25,7 +24,7 @@
   "dependencies": {
     "config": "^1.25.1",
     "koa": "^2.0.0",
-    "koa-bodyparser": "^2.3.0",
+    "koa-bodyparser": "^3.2.0",
     "koa-cors": "0.0.16",
     "koa-rest-cache": "^1.1.0",
     "koa-router": "^7.0.1",
