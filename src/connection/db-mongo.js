@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 let config = require('config');
 
-console.log(process.env.NODE_ENV);
+mongoose.Promise = global.Promise;
 
 mongoose.connect(config.DBHost);
 

@@ -2,6 +2,7 @@ import path from 'path';
 import _ from 'lodash';
 import money from 'money';
 import CustomException from './error';
+import moment from 'moment';
 
 class MyUtilities {
 
@@ -71,7 +72,6 @@ class MyUtilities {
 					for(let key in conversionRates){
 						if(currencies[i].toUpperCase() === key){
 							currencyConversion[key] = conversionRates[key];
-							//console.log(currencyConversion[key] );
 						}
 					}
 				}
@@ -80,7 +80,7 @@ class MyUtilities {
 			}
 
 			let rateResponse = {};
-			rateResponse.date = xrates.date;
+			rateResponse.date = moment(xrates.date).format('YYYY-MM-DD');
 			rateResponse.base = base;
 			rateResponse.rates = conversionRates;
 
@@ -119,7 +119,6 @@ class MyUtilities {
 
 				let res = {};
 				let currencyName = values[i].currency.toUpperCase();
-				console.log(currencyName);
 
 				if(money.rates.hasOwnProperty(currencyName)){
 					let convertedValue = money(values[i].value).from(currencyName).to(base);

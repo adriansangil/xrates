@@ -9,7 +9,7 @@ export let ConversionController = {
 		ctx.body = "update";
 
 		let conversionRequest = ctx.request.body;
-		let currencyDate = ctx.params.date || moment().startOf('day');
+		let currencyDate = moment(ctx.params.date).format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
 		Rate.validateConversion(conversionRequest);
 
@@ -23,7 +23,6 @@ export let ConversionController = {
 	      throw new CustomException("", "Currency Exchange not found");
    		}
 
-   		console.log(rate);
    		ctx.body = util.convert(rate[0], conversionRequest.base, conversionRequest.values);
 
 	},
@@ -31,11 +30,9 @@ export let ConversionController = {
 	create: async (ctx) => {
 		
 		let rateRequest = ctx.request.body;
-		rateRequest.date = ctx.params.date || moment().startOf('day');
+		rateRequest.date = moment(ctx.params.date).format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
 		let query = {'date':rateRequest.date};
-
-		//console.log(this.response.body);
 
 		//validation
 		rateRequest = Rate.validateRequest(rateRequest);
@@ -62,7 +59,7 @@ export let ConversionController = {
 
 		Rate.validateBase(base);
 
-		rateRequest.date = ctx.params.date || moment().startOf('day');
+		rateRequest.date = ctx.params.date || moment().format('YYYY-MM-DD');
 
 		let rate = await Rate
 			.find({"date":{$lte: rateRequest.date}})

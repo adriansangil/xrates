@@ -18,10 +18,10 @@ app.use(cors({
 }));
 
 //caching
-app.use(cache({
+/*app.use(cache({
   pattern: '/rates',
   maxAge: 600000 // ms
-}));
+}));*/
 
 app.use(bodyParser());
 
@@ -55,11 +55,18 @@ app.use(async (ctx, next) => {
 	    } else if (err.name === 'ValidationError') {
 	        ctx.status = 400;
 	        ctx.body = {
-	          code: 'INVALID_REQUEST',
-	          message: err.message,
-	          errors: err.errors
+				code: 'INVALID_REQUEST',
+				message: err.message,
+				errors: err.errors
 	        };
-	    } else {
+		} else if (err.name === 'Not Found') {
+	        ctx.status = 400;
+	        ctx.body = {
+				code: 'Resource not found',
+				message: err.message,
+				errors: err.errors
+			};
+		} else {
 	        ctx.body = {
 	          code: 'INTERNAL_SERVER_ERROR',
 	          message: err.message
@@ -67,15 +74,16 @@ app.use(async (ctx, next) => {
 	        ctx.status = 500;
 	    }
 
-	    ctx.app.emit('error', err, ctx);
+	    //ctx.app.emit('error', err, ctx);
 	}
 });
 
 app.use(_.routes());
 
 app.listen(3000);
+console.log("Listening on port " + 3000);
 
 
 
 
-
+module.exports = app;
